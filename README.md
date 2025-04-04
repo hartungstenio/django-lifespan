@@ -18,7 +18,7 @@ pip install django-lifespan
 ## Quickstart
 
 ### Integrate with Channels
-Django only supports HTTP events. Luckly, `channels` provide a routing configuration to support other events:
+Django only supports HTTP events. Luckily, `channels` provide a routing configuration to support other events:
 
 ```python
 # mysite/asgi.py
@@ -37,6 +37,23 @@ application = ProtocolTypeRouter(
     }
 )
 ```
+
+### Register your application state
+You can register values that your application server will pass in every request. This can be achieved by creating a `lifespan.py` file inside your app:
+
+```python
+# myapp/lifespan.py
+from contextlib import asynccontextmanager
+from aiohttp import ClientSession
+from django_lifespan import register_state
+
+@register_state("http_session")
+@asynccontextmanager
+async def http_session():
+    async with ClientSession() as session:
+        yield session
+```
+
 
 ## License
 
